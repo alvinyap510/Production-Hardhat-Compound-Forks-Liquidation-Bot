@@ -96,7 +96,7 @@ contract CompoundForksLiquidationBot is
     }
 
     /*
-    function withdraw(address _assetAddress) public onlyOwner; => Inheritance from Withdrawable.sol 
+    function withdraw(address _assetAddress) public onlyOwner; => Inheritance from Withdrawable.sol
     */
 
     //To approve other contracts to pull tokens in case code goes wrong
@@ -228,6 +228,7 @@ contract CompoundForksLiquidationBot is
 
     function flashLiquidate(
         uint _flashLoanMode,
+        uint _bribe,
         address _comptroller,
         address _borrowerToBeLiquidated,
         address _flashLoanToken,
@@ -238,20 +239,33 @@ contract CompoundForksLiquidationBot is
         // If flash loan source unknown, function reverts
         require(
             _flashLoanMode == 0 || _flashLoanMode == 1,
-            "Flash loan mode unknown, REVERT"
+            "Flash loan source unknown"
         );
+        // Require valid bribe amount
+        require(_bribe >= 0 && _bribe <= 100, "Invalid bribe");
 
-        // Store the starting balance of owner
+        // Store the starting balance of owner to compare
         uint256 ownerStartingEthBalance = CONTRACT_OWNER.balance;
-        //
 
+        //Assigning global variables
         COMPTROLLER = Comptroller(_comptroller);
         BORROWER_TO_BE_LIQUIDATED = _borrowerToBeLiquidated;
-        FLASH_LOAN_TOKEN = _flashLoanToken;
-        FLASH_LOAN_AMOUNT = _flashLoanAmount;
 
+        //Update State of Liquidity by calling any function;
+        uint256 _tempStore = _comptroller.getAllMarkets();
+        ISErc20Delegator _randomToken = ISErc20Delegator(_tempStore[0]);
+        _randomToken.borrowBalanceCurrent(
+            0x0000000000000000000000000000000000000000
+        );
+
+        // Require shortfall > 0, else unliquidable
         (uint error, uint liquidity, uint shortfall) = _comptroller
             .getAccountLiquidity(_borrowerToBeLiquidated);
+        require(shortfall > 0, "Cannot liquidate");
+
+        //Get token to flash loan, amount & C Token
+        FLASH_LOAN_TOKEN = _flashLoanToken;
+        FLASH_LOAN_AMOUNT = _flashLoanAmount;
 
         if (_flashLoanMode == 0) {
             aaveV2FlashLoanCall(_flashLoanToken, _flashLoanAmount);
@@ -270,6 +284,28 @@ contract CompoundForksLiquidationBot is
             "Losing liquidation, REVERT!"
         );
         //
+    }
+
+    function _liquidate(
+        address _borrower,
+        address _repayTokenAddress,
+        address _repayCTokenAddress,
+        uint256 _repayAmount,
+        address _cTokenCollateralToSeize
+    ) internal {
+        IERC20 repayToken = IERC20(_repayTokenAddress);
+        ISErc20Delegator repayCToken = ISErc20Delegator(_repayCTokenAddress);
+        repayToken.transferFrom(msg.sender, address(this), _repayAmount);
+        repayToken.approve(address(_repayCTokenAddress), _repayAmount);
+
+        require(
+            repayCToken.liquidateBorrow(
+                _borrower,
+                _repayAmount,
+                STokenInterface(_cTokenCollateralToSeize)
+            ) == 0,
+            "liquidate failed"
+        );
     }
 
     /* Uncallable code => To lookin
