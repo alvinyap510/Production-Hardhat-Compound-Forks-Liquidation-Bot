@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8;
 
+import "./CTokenInterfaces.sol";
+
 interface CErc20 {
     function balanceOf(address) external view returns (uint);
 
@@ -87,6 +89,15 @@ interface Comptroller {
         address cTokenCollateral,
         uint actualRepayAmount
     ) external view returns (uint, uint);
+
+    function isComptroller() external view returns (bool);
+
+    function getAssetsIn(address account)
+        external
+        view
+        returns (address[] memory);
+
+    function oracle() external view returns (address);
 }
 
 interface PriceFeed {

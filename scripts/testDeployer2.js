@@ -3842,7 +3842,7 @@ const USDC = new ethers.Contract(
 /* Main Body */
 /********************/
 async function main() {
-  console.log(await provider.getBalance(signer.getAddress()));
+  // console.log(await provider.getBalance(signer.getAddress()));
 
   console.log("Deploying CompoundForksLiquidationBot contract");
   const CompoundForksLiquidationBotFactory = await ethers.getContractFactory(
@@ -3852,8 +3852,10 @@ async function main() {
     await CompoundForksLiquidationBotFactory.deploy(
       "0xb53c1a33016b2dc2ff3653530bff1848a515c8c5", //LendingPoolAddressesProvider
       "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", //Router
+      // "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F", //Sushi Router
       "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Weth,
       "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f" //Factory
+      // "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac" //Sushi Factory
     );
   await CompoundForksLiquidationBot.deployed();
   console.log(
@@ -3862,11 +3864,35 @@ async function main() {
   console.log(CompoundForksLiquidationBot.address);
   console.log("\n");
 
-  //15047921669985325092
-  //16259260162768629300
-  //17773433278747759536
-  //9941417670644127909
-  //32293726576260383847
+  // console.log(await provider.getBalance(signer.getAddress()));
+
+  //
+  console.log("Deploying CompoundForksLiquidationBotV2 contract");
+  const CompoundForksLiquidationBotV2Factory = await ethers.getContractFactory(
+    "CompoundForksLiquidationBotV2"
+  );
+  const CompoundForksLiquidationBotV2 =
+    await CompoundForksLiquidationBotV2Factory.deploy();
+  await CompoundForksLiquidationBotV2.deployed();
+  console.log(
+    "Successfully deployed CompoundForksLiquidationBotV2 at address: "
+  );
+  console.log(CompoundForksLiquidationBotV2.address);
+  console.log("\n");
+  // //
+
+  // //
+  // console.log("Deploying TestCompoundLiquidate contract");
+  // const TestCompoundLiquidateFactory = await ethers.getContractFactory(
+  //   "TestCompoundLiquidate"
+  // );
+  // const TestCompoundLiquidate = await TestCompoundLiquidateFactory.deploy();
+  // await TestCompoundLiquidate.deployed();
+  // console.log("Successfully deployed TestCompoundLiquidate at address: ");
+  // console.log(TestCompoundLiquidate.address);
+  // console.log("\n");
+  //
+
   // await mine(500000);
   // await CToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
   // console.log("New Liquidity:");
@@ -3881,10 +3907,10 @@ async function main() {
   //   StrikeComptroller.address,
   //   "0xf4d50e97Ee3cbC375F0cE5c8d1bdf1CCA5DEde19", //Borrower
   //   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Flash Token To Borrow
-  //   // (39557n * 10n ** 18n) / 100000n, //Flash Loan Amount
-  //   100,
+  //   (39557n * 10n ** 18n) / 100000n, //Flash Loan Amount
   //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92",
-  //   "0x4164e5b047842Ad7dFf18fc6A6e63a1e40610f46"
+  //   "0x4164e5b047842Ad7dFf18fc6A6e63a1e40610f46",
+  //   false
   // );
 
   // await mine(230000);
@@ -3903,30 +3929,34 @@ async function main() {
   //   "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   //   4095000n * 10n ** 6n,
   //   "0x3774E825d567125988Fb293e926064B6FAa71DAB",
-  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB"
+  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB",
+  //   false
   // );
 
-  await mine(4000000);
-  await CToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
-  console.log("New Liquidity:");
-  console.log(
-    await StrikeComptroller.getAccountLiquidity(
-      "0x7B052756f8Cb2fDCD9DE2F1665D0D6648317346A"
-    )
-  );
+  // await mine(3900000);
+  // await CToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("New Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x7B052756f8Cb2fDCD9DE2F1665D0D6648317346A"
+  //   )
+  // );
+  // console.log(await provider.getBalance(signer.getAddress()));
 
-  const liquidationTxTest3 = CompoundForksLiquidationBot.flashLiquidate(
-    1,
-    0,
-    StrikeComptroller.address,
-    "0x7B052756f8Cb2fDCD9DE2F1665D0D6648317346A", //Borrower
-    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Flash Token To Borrow
-    // (39557n * 10n ** 18n) / 100000n, //Flash Loan Amount
-    1000000n,
-    "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92",
-    "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92"
-  );
-
+  // const liquidationTxTest3 = await CompoundForksLiquidationBot.flashLiquidate(
+  //   0,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0x7B052756f8Cb2fDCD9DE2F1665D0D6648317346A", //Borrower
+  //   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Flash Token To Borrow
+  //   // 35n * 10n ** 18n, //Flash Loan Amount
+  //   100000000000000,
+  //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92",
+  //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92",
+  //   true
+  // );
+  // // console.log(await liquidationTxTest3.wait());
+  // console.log(await provider.getBalance(signer.getAddress()));
   // await mine(2300000);
   // await CToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
   // // await MirrorCompoundForksLiquidationBot.callStatic._getBorrowBalance(
@@ -3964,7 +3994,8 @@ async function main() {
   //   "0x4d224452801ACEd8B2F0aebE155379bb5D594381",
   //   1000n * 10n ** 18n,
   //   "0xf24A7D2077285E192Aa7dF957a4a699c144510d8",
-  //   "0xf24A7D2077285E192Aa7dF957a4a699c144510d8"
+  //   "0xf24A7D2077285E192Aa7dF957a4a699c144510d8",
+  //   false
   // );
 
   // await mine(1000000000);
@@ -3984,7 +4015,214 @@ async function main() {
   //   "0x8CE9137d39326AD0cD6491fb5CC0CbA0e089b6A9", //Flash Token
   //   1000n * 10n ** 18n,
   //   "0xdBee1d8C452c781C17Ea20115CbaD0d5f627a680", //C Repay
-  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB" //C Seize
+  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB", //C Seize
+  //   false
+  // );
+
+  //@Weth to Weth
+  // await mine(3800000);
+  // const newCToken = new ethers.Contract(
+  //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92",
+  //   CToken.interface,
+  //   signer
+  // );
+  // await newCToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x7b052756f8cb2fdcd9de2f1665d0d6648317346a"
+  //   )
+  // );
+  // const tx1 = CompoundForksLiquidationBot.flashLiquidate(
+  //   1,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0x7b052756f8cb2fdcd9de2f1665d0d6648317346a", //Borrower
+  //   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Flash Token
+  //   30n * 10n ** 18n,
+  //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92", //C Repay
+  //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92", //C Seize
+  //   true
+  // );
+  // await newCToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity after Liquidation:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x7b052756f8cb2fdcd9de2f1665d0d6648317346a"
+  //   )
+  // );
+
+  // // @Uni to Uni
+  // await mine(2000000);
+  // const newCToken2 = new ethers.Contract(
+  //   "0x280f76a218DDC8d56B490B5835e251E55a2e8F8d",
+  //   CToken.interface,
+  //   signer
+  // );
+  // await newCToken2.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0xdb32cf55306a78e32c825729bdf8e917bd328725"
+  //   )
+  // );
+  // const tx1 = CompoundForksLiquidationBot.flashLiquidate(
+  //   1,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0xdb32cf55306a78e32c825729bdf8e917bd328725", //Borrower
+  //   "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", //Flash Token
+  //   1n * 10n ** 18n,
+  //   "0x280f76a218DDC8d56B490B5835e251E55a2e8F8d", //C Repay
+  //   "0x280f76a218DDC8d56B490B5835e251E55a2e8F8d", //C Seize
+  //   false
+  // );
+  // await newCToken2.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity after Liquidation:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0xdb32cf55306a78e32c825729bdf8e917bd328725"
+  //   )
+  // );
+
+  // // @USDT to USDT => Failed
+  // await mine(600000);
+  // const newCToken3 = new ethers.Contract(
+  //   "0x69702cfd7DAd8bCcAA24D6B440159404AAA140F5",
+  //   CToken.interface,
+  //   signer
+  // );
+  // await newCToken3.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0xee2826453a4fd5afeb7ceffeef3ffa2320081268"
+  //   )
+  // );
+  // const tx1 = CompoundForksLiquidationBot.flashLiquidate(
+  //   1,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0xee2826453a4fd5afeb7ceffeef3ffa2320081268", //Borrower
+  //   "0xdAC17F958D2ee523a2206206994597C13D831ec7", //Flash Token
+  //   4100000n * 10n ** 6n,
+  //   "0x69702cfd7DAd8bCcAA24D6B440159404AAA140F5", //C Repay
+  //   "0x69702cfd7DAd8bCcAA24D6B440159404AAA140F5", //C Seize
+  //   false
+  // );
+  // await newCToken3.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity after Liquidation:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0xee2826453a4fd5afeb7ceffeef3ffa2320081268"
+  //   )
+  // );
+
+  // // @USDC to USDC
+  // await mine(300000);
+  // const newCToken4 = new ethers.Contract(
+  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB",
+  //   CToken.interface,
+  //   signer
+  // );
+  // await newCToken4.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5"
+  //   )
+  // );
+  // const tx1 = CompoundForksLiquidationBot.flashLiquidate(
+  //   1,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5", //Borrower
+  //   "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", //Flash Token
+  //   4000000n * 10n ** 6n,
+  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB", //C Repay
+  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB", //C Seize
+  //   false
+  // );
+  // await newCToken4.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity after Liquidation:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5"
+  //   )
+  // );
+
+  // // // @BUSD to STRIKE => Failed Uniswap No Liquidity
+  // await mine(200000000);
+  // const newCToken5 = new ethers.Contract(
+  //   "0x18A908eD663823C908A900b934D6249d4befbE44",
+  //   CToken.interface,
+  //   signer
+  // );
+  // await newCToken5.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x79828E235f405E96fAe2F7279cBB7F8aEcb46DEc"
+  //   )
+  // );
+  // const tx1 = CompoundForksLiquidationBot.flashLiquidate(
+  //   1,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0x79828E235f405E96fAe2F7279cBB7F8aEcb46DEc", //Borrower
+  //   "0x4Fabb145d64652a948d72533023f6E7A623C7C53", //Flash Token
+  //   1000n * 10n ** 18n,
+  //   "0x18A908eD663823C908A900b934D6249d4befbE44", //C Repay
+  //   "0x4164e5b047842Ad7dFf18fc6A6e63a1e40610f46", //C Seize
+  //   false
+  // );
+  // await newCToken5.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity after Liquidation:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x79828E235f405E96fAe2F7279cBB7F8aEcb46DEc"
+  //   )
+  // );
+
+  // @WETH to STRK
+  //23228
+  //8789
+  // await mine(18000000);
+  // const newCToken6 = new ethers.Contract(
+  //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92",
+  //   CToken.interface,
+  //   signer
+  // );
+  // const newCToken7 = new ethers.Contract(
+  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB",
+  //   CToken.interface,
+  //   signer
+  // );
+  // await newCToken6.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // // await newCToken7.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x6d478cb16317680a517ff89253f82032efdc31ba"
+  //   )
+  // );
+  // const tx1 = CompoundForksLiquidationBot.flashLiquidate(
+  //   0,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0x6d478cb16317680a517ff89253f82032efdc31ba", //Borrower
+  //   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Flash Token
+  //   1n * 10n ** 18n,
+  //   "0xbEe9Cf658702527b0AcB2719c1FAA29EdC006a92", //C Repay
+  //   "0x3774E825d567125988Fb293e926064B6FAa71DAB", //C Seize
+  //   false
+  // );
+  // await newCToken6.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("Liquidity after Liquidation:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x6d478cb16317680a517ff89253f82032efdc31ba"
+  //   )
   // );
 
   // const liquidationTx = CompoundForksLiquidationBot.flashLiquidate(
@@ -4004,6 +4242,53 @@ async function main() {
   // console.log(await provider.getBalance(signer.getAddress()));
   // console.log(await provider.getBalance(CompoundForksLiquidationBot.address));
   // await mine(1);
+
+  console.log("Liquidity:");
+  console.log(
+    await StrikeComptroller.getAccountLiquidity(
+      "0xeca023e03127205dca2f196b8b32bdd748203587"
+    )
+  );
+
+  await mine(1);
+  console.log(
+    await CompoundForksLiquidationBotV2.callStatic.flashLiquidate(
+      "0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602",
+      "0xeca023e03127205dca2f196b8b32bdd748203587",
+      0
+    )
+  );
+  const tx = await CompoundForksLiquidationBotV2.flashLiquidate(
+    "0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602",
+    "0xeca023e03127205dca2f196b8b32bdd748203587",
+    0
+  );
+  console.log(await tx.wait());
+
+  console.log("Liquidity:");
+  console.log(
+    await StrikeComptroller.getAccountLiquidity(
+      "0xeca023e03127205dca2f196b8b32bdd748203587"
+    )
+  );
+  // await CToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
+  // console.log("New Liquidity:");
+  // console.log(
+  //   await StrikeComptroller.getAccountLiquidity(
+  //     "0x5ca9568930f61BA40d90F4D1707a93aB78DB6325"
+  //   )
+  // );
+  // const liquidationTx5 = CompoundForksLiquidationBot.flashLiquidate(
+  //   1,
+  //   0,
+  //   StrikeComptroller.address,
+  //   "0x5ca9568930f61BA40d90F4D1707a93aB78DB6325",
+  //   "0x4d224452801ACEd8B2F0aebE155379bb5D594381",
+  //   1000n * 10n ** 18n,
+  //   "0xf24A7D2077285E192Aa7dF957a4a699c144510d8",
+  //   "0xf24A7D2077285E192Aa7dF957a4a699c144510d8",
+  //   false
+  // );
 }
 
 main().catch((error) => {

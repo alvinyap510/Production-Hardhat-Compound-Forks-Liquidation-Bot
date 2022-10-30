@@ -23,5 +23,18 @@ module.exports = {
       chainID: 1,
     },
   },
-  solidity: "0.8.17",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.17",
+        settings: {
+          optimizer: {
+            runs: 200,
+            enabled: true,
+          },
+          viaIR: true,
+        },
+      },
+    ],
+  },
 };

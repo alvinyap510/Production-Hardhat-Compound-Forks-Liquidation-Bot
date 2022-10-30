@@ -11,7 +11,7 @@ import "../interfaces/CompoundInterfaces.sol";
 
 contract TestCompoundLiquidate {
     Comptroller public comptroller =
-        Comptroller(0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B);
+        Comptroller(0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602);
 
     PriceFeed public priceFeed =
         PriceFeed(0x922018674c12a7F0D394ebEEf9B58F186CdE13c1);
@@ -23,18 +23,18 @@ contract TestCompoundLiquidate {
 
     event Log(string message, uint val);
 
-    constructor(
-        address _tokenSupply,
-        address _cTokenSupply,
-        address _tokenBorrow,
-        address _cTokenBorrow
-    ) {
-        tokenSupply = IERC20(_tokenSupply);
-        cTokenSupply = CErc20(_cTokenSupply);
+    // constructor(
+    //     address _tokenSupply,
+    //     address _cTokenSupply,
+    //     address _tokenBorrow,
+    //     address _cTokenBorrow
+    // ) {
+    //     tokenSupply = IERC20(_tokenSupply);
+    //     cTokenSupply = CErc20(_cTokenSupply);
 
-        tokenBorrow = IERC20(_tokenBorrow);
-        cTokenBorrow = CErc20(_cTokenBorrow);
-    }
+    //     tokenBorrow = IERC20(_tokenBorrow);
+    //     cTokenBorrow = CErc20(_cTokenBorrow);
+    // }
 
     function supply(uint _amount) external {
         tokenSupply.transferFrom(msg.sender, address(this), _amount);
@@ -43,8 +43,11 @@ contract TestCompoundLiquidate {
     }
 
     // not view function
-    function getSupplyBalance() external returns (uint) {
-        return cTokenSupply.balanceOfUnderlying(address(this));
+    function getSupplyBalance(address _cTokenCollateral)
+        external
+        returns (uint)
+    {
+        return CErc20(_cTokenCollateral).balanceOfUnderlying(address(this));
     }
 
     function getCollateralFactor() external view returns (uint) {
