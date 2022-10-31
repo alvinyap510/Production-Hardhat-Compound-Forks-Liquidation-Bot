@@ -21,6 +21,9 @@ let tx;
 /* Recreate */
 /********************/
 
+//0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B
+//0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602
+//0xDE607fe5Cb415d83Fe4A976afD97e5DaEeaedB07 //Ape Finance
 const StrikeComptroller = new ethers.Contract(
   "0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602",
   [
@@ -3872,7 +3875,12 @@ async function main() {
     "CompoundForksLiquidationBotV2"
   );
   const CompoundForksLiquidationBotV2 =
-    await CompoundForksLiquidationBotV2Factory.deploy();
+    await CompoundForksLiquidationBotV2Factory.deploy(
+      "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5",
+      "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      "0x1111111254fb6c44bAC0beD2854e76F90643097d"
+    );
   await CompoundForksLiquidationBotV2.deployed();
   console.log(
     "Successfully deployed CompoundForksLiquidationBotV2 at address: "
@@ -4243,34 +4251,64 @@ async function main() {
   // console.log(await provider.getBalance(CompoundForksLiquidationBot.address));
   // await mine(1);
 
+  //0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5
+  //0xee2826453a4fd5afeb7ceffeef3ffa2320081268
+
+  const userTestAddress = "0xee2826453a4fd5afeb7ceffeef3ffa2320081268";
+  const bribe = 30;
+
   console.log("Liquidity:");
+  console.log(await StrikeComptroller.getAccountLiquidity(userTestAddress));
   console.log(
-    await StrikeComptroller.getAccountLiquidity(
-      "0xeca023e03127205dca2f196b8b32bdd748203587"
+    await CompoundForksLiquidationBotV2.getHealthFactor(
+      StrikeComptroller.address,
+      userTestAddress
     )
   );
 
-  await mine(1);
+  await mine(71500);
+  await CompoundForksLiquidationBotV2._updateAccountState(
+    StrikeComptroller.address,
+    userTestAddress
+  );
+  console.log(
+    await CompoundForksLiquidationBotV2.callStatic._updateAccountState(
+      StrikeComptroller.address,
+      userTestAddress
+    )
+  );
+  console.log("Liquidity:");
+  console.log(await StrikeComptroller.getAccountLiquidity(userTestAddress));
+  console.log(
+    await CompoundForksLiquidationBotV2.getHealthFactor(
+      StrikeComptroller.address,
+      userTestAddress
+    )
+  );
   console.log(
     await CompoundForksLiquidationBotV2.callStatic.flashLiquidate(
-      "0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602",
-      "0xeca023e03127205dca2f196b8b32bdd748203587",
-      0
+      StrikeComptroller.address,
+      userTestAddress,
+      bribe
     )
   );
   const tx = await CompoundForksLiquidationBotV2.flashLiquidate(
-    "0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602",
-    "0xeca023e03127205dca2f196b8b32bdd748203587",
-    0
+    StrikeComptroller.address,
+    userTestAddress,
+    30
   );
   console.log(await tx.wait());
 
   console.log("Liquidity:");
+  console.log(await StrikeComptroller.getAccountLiquidity(userTestAddress));
   console.log(
-    await StrikeComptroller.getAccountLiquidity(
-      "0xeca023e03127205dca2f196b8b32bdd748203587"
+    await CompoundForksLiquidationBotV2.getHealthFactor(
+      StrikeComptroller.address,
+      userTestAddress
     )
   );
+  console.log(await provider.getBalance(signer.getAddress()));
+
   // await CToken.borrowBalanceCurrent(await signer.getAddress()); //Switch
   // console.log("New Liquidity:");
   // console.log(
