@@ -34,8 +34,9 @@ contract CompoundForksLiquidationBotV2 is
     using SafeERC20 for IERC20;
     event Log(string message, uint val);
 
-    uint256 public MAX_INT =
+    uint256 public constant MAX_INT =
         115792089237316195423570985008687907853269984665640564039457584007913129639935;
+    uint256 public constant GWEI = 1e9;
 
     //Contract Global Variables
     address payable public CONTRACT_OWNER;
@@ -82,6 +83,63 @@ contract CompoundForksLiquidationBotV2 is
     /********************/
     /* Main Liquidate Bot Body */
     /********************/
+
+    //@Author manual function
+
+    // function flashLiquidateManual(
+    //     address _comptroller,
+    //     address _borrowerToLiquidate,
+    //     uint32 _bribePercentage,
+    //     address _cTokenRepay,
+    //     address _cTokenToSeize,
+    //     address _flashLoanTokenAddress,
+    //     uint256 _flashLoanTokenAmount,
+    //     uint32 _flashLoanMode
+    // ) public onlyOwner {
+    //     //@Variables
+    //     COMPTROLLER = Comptroller(_comptroller);
+    //     PRICE_FEED = IPriceFeed(COMPTROLLER.oracle());
+    //     BORROWER_TO_BE_LIQUIDATED = _borrowerToLiquidate;
+    //     BRIBE = _bribePercentage;
+    //     CTOKEN_REPAY = _cTokenRepay;
+    //     CTOKEN_COLLATERAL_TO_SEIZE = _cTokenToSeize;
+    //     FLASH_LOAN_TOKEN = _flashLoanTokenAddress;
+    //     FLASH_LOAN_AMOUNT = _flashLoanTokenAmount;
+    //     FLASH_LOAN_MODE = _flashLoanMode;
+
+    //     //@Flash loan source
+
+    //     if (FLASH_LOAN_MODE == 0) {
+    //         aaveV2FlashLoanCall(FLASH_LOAN_TOKEN, FLASH_LOAN_AMOUNT);
+    //     } else if (FLASH_LOAN_MODE == 1) {
+    //         uniswapV2FlashLoanCall(FLASH_LOAN_TOKEN, FLASH_LOAN_AMOUNT);
+    //     }
+
+    //     //@Swap profit to Weth
+
+    //     if (FLASH_LOAN_TOKEN != WETH) {
+    //         uint256 _profitToConvert = IERC20(FLASH_LOAN_TOKEN).balanceOf(
+    //             address(this)
+    //         );
+    //         _fastSwap(FLASH_LOAN_TOKEN, WETH, _profitToConvert, ROUTER);
+    //     }
+
+    //     //@Withdraw WETH as Ether
+
+    //     IWETH WETH_INTERACT = IWETH(WETH);
+    //     uint256 _amountWethToWithdraw = IERC20(WETH).balanceOf(address(this));
+    //     WETH_INTERACT.withdraw(_amountWethToWithdraw);
+
+    //     //@Bribe flashbots miners
+
+    //     uint256 _profit = address(this).balance;
+    //     uint256 _profitToBribe = _profit.mul(_bribePercentage).div(100);
+    //     block.coinbase.transfer(_profitToBribe);
+
+    //     //@Transfer profit to contract owner
+
+    //     CONTRACT_OWNER.transfer(address(this).balance);
+    // }
 
     function flashLiquidate(
         address _comptroller,
