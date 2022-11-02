@@ -959,14 +959,13 @@ async function main() {
       ]);
 
       const targetBlock = block + 1;
-
-      //Simulate
-
-      const sim = await flashbot.simulate(signedTx, targetBlock);
-
-      // console.log(sim);
-
       try {
+        //Simulate
+
+        const sim = await flashbot.simulate(signedTx, targetBlock);
+
+        // console.log(sim);
+
         if ("error" in sim.results[0]) {
           console.log("\n");
           console.log(`simulation error: ${sim.results[0].error}`);
@@ -1011,7 +1010,9 @@ async function main() {
             process.exit(1);
           }
         }
-      } catch {}
+      } catch {
+        console.log("Flashbot or Provider endpoint error");
+      }
     }
     console.log("\n");
     console.log(`End of block trying: ${block}`);
