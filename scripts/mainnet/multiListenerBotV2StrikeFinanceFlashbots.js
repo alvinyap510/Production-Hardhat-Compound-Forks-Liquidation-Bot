@@ -25,8 +25,11 @@ const GWEI = 10n ** 9n;
 const ETHER = 10n ** 18n;
 
 //@Mainnet
+// const provider = new providers.JsonRpcProvider({
+//   url: process.env.MAINNET_RPC_URL,
+// });
 const provider = new providers.JsonRpcProvider({
-  url: process.env.MAINNET_RPC_URL,
+  url: process.env.MAINNET_PUBLIC_ANKR_RPC_URL,
 });
 const CHAIN_ID = 1;
 
