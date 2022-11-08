@@ -12,6 +12,7 @@ require("dotenv").config();
 
 //Setup Environment & Providers
 const hre = require("hardhat");
+const fs = require("fs");
 
 const { providers, Wallet, ethers } = require("ethers");
 const {
@@ -29,8 +30,10 @@ const ETHER = 10n ** 18n;
 //   url: process.env.MAINNET_RPC_URL,
 // });
 const provider = new providers.JsonRpcProvider({
+  // url: process.env.MAINNET_RPC_URL,
   url: process.env.MAINNET_PUBLIC_ANKR_RPC_URL,
 });
+
 const CHAIN_ID = 1;
 
 // //@Switch Local
@@ -38,16 +41,23 @@ const CHAIN_ID = 1;
 
 const FLASHBOTS_ENDPOINT = "https://relay.flashbots.net";
 const signer = new Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
+// const signer = new Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
+// c28053c8d262f2face2849de5d2bac8f31ec1921a5b84e8eff7208a3c6e24bd6;
 
 //@Liquidation Target
 const accountsToLiquidate = [
-  "0xee2826453a4fd5afeb7ceffeef3ffa2320081268",
-  "0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5",
-  "0x5ca9568930f61ba40d90f4d1707a93ab78db6325",
+  // "0x4c74c6978de5f9f6972397648a7092b345911ee8",
+  // "0xee2826453a4fd5afeb7ceffeef3ffa2320081268",
+  // "0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5",
   "0xeca023e03127205dca2f196b8b32bdd748203587",
-  "0x6d478cb16317680a517ff89253f82032efdc31ba",
-  "0x7bf97c7a86508cdb54cccbd3e853042b14778ee9",
+  // "0x6d478cb16317680a517ff89253f82032efdc31ba",
+  // "0x7bf97c7a86508cdb54cccbd3e853042b14778ee9",
+  // "0x79828e235f405e96fae2f7279cbb7f8aecb46dec",
+  "0x41a9b21b791693730f57154ceed2a2a3607ef1ef",
+  "0x8053b464df2fe2ad38468f1a2d2453fbb3aa9e4b",
+  "0x5ca9568930f61ba40d90f4d1707a93ab78db6325",
 ];
+// const accountsToLiquidate = ["0xeCA023e03127205dCa2F196B8b32bdD748203587"];
 
 /********************/
 /* Recreate Instances */
@@ -910,8 +920,9 @@ Main Function
 async function main() {
   //An identifying key for signing payloads to establish reputation and whitelisting
   console.log(process.argv);
+
   const authSigner = new Wallet(
-    "0x2000000000000000000000000000000000000000000000000000000000000000"
+    "0x5000000000000000000000000000000000000000000000000000000000000000"
   );
 
   //Create Flashbot Instance
@@ -939,7 +950,7 @@ async function main() {
       const transactionData =
         "0x8615c7a3000000000000000000000000e2e17b2cbbf48211fa7eb8a875360e5e39ba2602000000000000000000000000" +
         accountsToLiquidate[i].slice(2) +
-        "0000000000000000000000000000000000000000000000000000000000000014";
+        "0000000000000000000000000000000000000000000000000000000000000032";
 
       const signedTx = await flashbot.signBundle([
         {
@@ -952,8 +963,10 @@ async function main() {
             gasLimit: 8000000,
             value: 0,
             data: transactionData,
+            // data: "0x",
             //   data: "0x8615c7a3000000000000000000000000e2e17b2cbbf48211fa7eb8a875360e5e39ba2602000000000000000000000000ee2826453a4fd5afeb7ceffeef3ffa23200812680000000000000000000000000000000000000000000000000000000000000014",
             to: "0xa8d15de0cF2a7f6e3BfD3f68b6EdC6b0b946d6a6",
+            // to: "0x",
           },
         },
       ]);
@@ -963,8 +976,6 @@ async function main() {
         //Simulate
 
         const sim = await flashbot.simulate(signedTx, targetBlock);
-
-        // console.log(sim);
 
         if ("error" in sim.results[0]) {
           console.log("\n");
@@ -979,6 +990,15 @@ async function main() {
           console.log(`Success in Block Number: ${block}`);
           console.log(`Liquidation target: ${accountsToLiquidate[i]}`);
           console.log("\n");
+
+          //Writing log
+
+          const message = `Enter liquidation processs at block ${block} on account ${accountsToLiquidate[i]}`;
+
+          fs.appendFile("./log.txt", message, function (err) {
+            if (err) throw err;
+            console.log("Written Deployed Addresses!");
+          });
 
           //Trying liquidation
           console.log("Beginning liquidation...");

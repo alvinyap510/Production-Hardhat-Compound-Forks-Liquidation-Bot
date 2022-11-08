@@ -12,11 +12,11 @@ const {
 const fs = require("fs");
 const provider = ethers.provider;
 // const signer = new ethers.Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
-const signer = provider.getSigner();
+// const signer = provider.getSigner();
 const { mine } = require("@nomicfoundation/hardhat-network-helpers");
 const { Wallet } = require("ethers");
 let tx;
-
+const signer = new Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
 /********************/
 /* Recreate */
 /********************/
@@ -3840,6 +3840,856 @@ const USDC = new ethers.Contract(
   signer
 );
 
+const CompoundForksLiquidationBotV2 = new ethers.Contract(
+  "0xa8d15de0cF2a7f6e3BfD3f68b6EdC6b0b946d6a6",
+  [
+    {
+      inputs: [
+        {
+          internalType: "contract ILendingPoolAddressesProvider",
+          name: "_addressProvider",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_weth",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_router",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_oneInchRouter",
+          type: "address",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "constructor",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: "string",
+          name: "message",
+          type: "string",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "val",
+          type: "uint256",
+        },
+      ],
+      name: "Log",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "_from",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "_assetAddress",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "LogWithdraw",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "previousOwner",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "OwnershipTransferred",
+      type: "event",
+    },
+    {
+      inputs: [],
+      name: "ADDRESSES_PROVIDER",
+      outputs: [
+        {
+          internalType: "contract ILendingPoolAddressesProvider",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "BORROWER_TO_BE_LIQUIDATED",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "BRIBE",
+      outputs: [
+        {
+          internalType: "uint32",
+          name: "",
+          type: "uint32",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "COMPTROLLER",
+      outputs: [
+        {
+          internalType: "contract Comptroller",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "CONTRACT_OWNER",
+      outputs: [
+        {
+          internalType: "address payable",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "CTOKEN_COLLATERAL_TO_SEIZE",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "CTOKEN_REPAY",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "FACTORY",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "FLASH_LOAN_AMOUNT",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "FLASH_LOAN_MODE",
+      outputs: [
+        {
+          internalType: "uint32",
+          name: "",
+          type: "uint32",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "FLASH_LOAN_TOKEN",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "GWEI",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "LENDING_POOL",
+      outputs: [
+        {
+          internalType: "contract ILendingPool",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "MAX_INT",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "ONE_INCH_ROUTER",
+      outputs: [
+        {
+          internalType: "contract OneInchRouterInterface",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "PRICE_FEED",
+      outputs: [
+        {
+          internalType: "contract IPriceFeed",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "ROUTER",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "SEIZED_ASSET",
+      outputs: [
+        {
+          internalType: "contract IERC20",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "WETH",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_CTokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_borrower",
+          type: "address",
+        },
+      ],
+      name: "_getCollateralUnderlyingAmountInToken",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_CTokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_borrower",
+          type: "address",
+        },
+      ],
+      name: "_getDebtUnderlyingAmountInToken",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_tokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_lendingPool",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_factory",
+          type: "address",
+        },
+      ],
+      name: "_getFlashloanSource",
+      outputs: [
+        {
+          internalType: "uint32",
+          name: "",
+          type: "uint32",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_CTokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_priceFeed",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "_amount",
+          type: "uint256",
+        },
+      ],
+      name: "_getUsdValueOfAsset",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_borrower",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_repayTokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_repayCTokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "_repayAmount",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "_cTokenCollateralToSeize",
+          type: "address",
+        },
+      ],
+      name: "_liquidate",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_comptroller",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_borrower",
+          type: "address",
+        },
+      ],
+      name: "_updateAccountState",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_flashLoanToken",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "_flashLoanAmount",
+          type: "uint256",
+        },
+      ],
+      name: "aaveV2FlashLoanCall",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_tokenAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_spenderAddress",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "_amount",
+          type: "uint256",
+        },
+      ],
+      name: "approveToken",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address[]",
+          name: "assets",
+          type: "address[]",
+        },
+        {
+          internalType: "uint256[]",
+          name: "amounts",
+          type: "uint256[]",
+        },
+        {
+          internalType: "uint256[]",
+          name: "premiums",
+          type: "uint256[]",
+        },
+        {
+          internalType: "address",
+          name: "initiator",
+          type: "address",
+        },
+        {
+          internalType: "bytes",
+          name: "params",
+          type: "bytes",
+        },
+      ],
+      name: "executeOperation",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_comptroller",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_borrowerToLiquidate",
+          type: "address",
+        },
+        {
+          internalType: "uint32",
+          name: "_bribePercentage",
+          type: "uint32",
+        },
+      ],
+      name: "flashLiquidate",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+        {
+          internalType: "uint32",
+          name: "",
+          type: "uint32",
+        },
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_comptroller",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "_borrower",
+          type: "address",
+        },
+      ],
+      name: "getHealthFactor",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_cTokenCollateral",
+          type: "address",
+        },
+      ],
+      name: "getSupplyBalance",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "owner",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "renounceOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "transferOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_sender",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "_amount0",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "_amount1",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes",
+          name: "_data",
+          type: "bytes",
+        },
+      ],
+      name: "uniswapV2Call",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_flashLoanToken",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "_flashLoanAmount",
+          type: "uint256",
+        },
+      ],
+      name: "uniswapV2FlashLoanCall",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_addressProvider",
+          type: "address",
+        },
+      ],
+      name: "updateLendingPoolAddressesProvider",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_router",
+          type: "address",
+        },
+      ],
+      name: "updateRouter",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_assetAddress",
+          type: "address",
+        },
+      ],
+      name: "withdraw",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      stateMutability: "payable",
+      type: "receive",
+    },
+  ],
+  signer
+);
+
 //@Author
 /********************/
 /* Main Body */
@@ -3847,46 +4697,46 @@ const USDC = new ethers.Contract(
 async function main() {
   // console.log(await provider.getBalance(signer.getAddress()));
 
-  console.log("Deploying CompoundForksLiquidationBot contract");
-  const CompoundForksLiquidationBotFactory = await ethers.getContractFactory(
-    "CompoundForksLiquidationBot"
-  );
-  const CompoundForksLiquidationBot =
-    await CompoundForksLiquidationBotFactory.deploy(
-      "0xb53c1a33016b2dc2ff3653530bff1848a515c8c5", //LendingPoolAddressesProvider
-      "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", //Router
-      // "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F", //Sushi Router
-      "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Weth,
-      "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f" //Factory
-      // "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac" //Sushi Factory
-    );
-  await CompoundForksLiquidationBot.deployed();
-  console.log(
-    "Successfully deployed CompoundForksLiquidationBotFactory at address: "
-  );
-  console.log(CompoundForksLiquidationBot.address);
-  console.log("\n");
+  // console.log("Deploying CompoundForksLiquidationBot contract");
+  // const CompoundForksLiquidationBotFactory = await ethers.getContractFactory(
+  //   "CompoundForksLiquidationBot"
+  // );
+  // const CompoundForksLiquidationBot =
+  //   await CompoundForksLiquidationBotFactory.deploy(
+  //     "0xb53c1a33016b2dc2ff3653530bff1848a515c8c5", //LendingPoolAddressesProvider
+  //     "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", //Router
+  //     // "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F", //Sushi Router
+  //     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", //Weth,
+  //     "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f" //Factory
+  //     // "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac" //Sushi Factory
+  //   );
+  // await CompoundForksLiquidationBot.deployed();
+  // console.log(
+  //   "Successfully deployed CompoundForksLiquidationBotFactory at address: "
+  // );
+  // console.log(CompoundForksLiquidationBot.address);
+  // console.log("\n");
 
   // console.log(await provider.getBalance(signer.getAddress()));
 
   //
-  console.log("Deploying CompoundForksLiquidationBotV2 contract");
-  const CompoundForksLiquidationBotV2Factory = await ethers.getContractFactory(
-    "CompoundForksLiquidationBotV2"
-  );
-  const CompoundForksLiquidationBotV2 =
-    await CompoundForksLiquidationBotV2Factory.deploy(
-      "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5",
-      "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-      "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
-      "0x1111111254fb6c44bAC0beD2854e76F90643097d"
-    );
-  await CompoundForksLiquidationBotV2.deployed();
-  console.log(
-    "Successfully deployed CompoundForksLiquidationBotV2 at address: "
-  );
-  console.log(CompoundForksLiquidationBotV2.address);
-  console.log("\n");
+  // console.log("Deploying CompoundForksLiquidationBotV2 contract");
+  // const CompoundForksLiquidationBotV2Factory = await ethers.getContractFactory(
+  //   "CompoundForksLiquidationBotV2"
+  // );
+  // const CompoundForksLiquidationBotV2 =
+  //   await CompoundForksLiquidationBotV2Factory.deploy(
+  //     "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5",
+  //     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+  //     "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+  //     "0x1111111254fb6c44bAC0beD2854e76F90643097d"
+  //   );
+  // await CompoundForksLiquidationBotV2.deployed();
+  // console.log(
+  //   "Successfully deployed CompoundForksLiquidationBotV2 at address: "
+  // );
+  // console.log(CompoundForksLiquidationBotV2.address);
+  // console.log("\n");
   // //
 
   // //
@@ -4254,7 +5104,10 @@ async function main() {
   //0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5
   //0xee2826453a4fd5afeb7ceffeef3ffa2320081268
 
-  const userTestAddress = "0xee2826453a4fd5afeb7ceffeef3ffa2320081268";
+  console.log("Current block is: " + (await provider.getBlockNumber()));
+  const feeData = await provider.getFeeData();
+
+  const userTestAddress = "0xeCA023e03127205dCa2F196B8b32bdD748203587";
   const bribe = 30;
 
   console.log("Liquidity:");
@@ -4266,7 +5119,7 @@ async function main() {
     )
   );
 
-  await mine(71500);
+  // await mine(71500);
   await CompoundForksLiquidationBotV2._updateAccountState(
     StrikeComptroller.address,
     userTestAddress
@@ -4295,8 +5148,15 @@ async function main() {
   const tx = await CompoundForksLiquidationBotV2.flashLiquidate(
     StrikeComptroller.address,
     userTestAddress,
-    30
+    0,
+    {
+      // maxFeePerGas: feeData.maxFeePerGas * 1.5,
+      // maxPriorityFeePerGas: feeData.maxPriorityFeePerGas * 2,
+      maxFeePerGas: 20n * 10n ** 9n,
+      gasLimit: 8000000,
+    }
   );
+  console.log(tx);
   console.log(await tx.wait());
 
   console.log("Liquidity:");

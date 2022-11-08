@@ -92,6 +92,8 @@ interface Comptroller {
 
     function isComptroller() external view returns (bool);
 
+    function isTectonicCore() external view returns (bool);
+
     function getAssetsIn(address account)
         external
         view

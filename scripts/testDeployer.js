@@ -2540,6 +2540,7 @@ async function main() {
       "0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5"
     )
   );
+}
 
 main().catch((error) => {
   console.error(error);
