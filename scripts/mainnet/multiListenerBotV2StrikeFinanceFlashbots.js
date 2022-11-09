@@ -37,7 +37,7 @@ const provider = new providers.JsonRpcProvider({
 const CHAIN_ID = 1;
 
 // //@Switch Local
-// const provider = ethers.provider;
+// const provider = hre.ethers.provider;
 
 const FLASHBOTS_ENDPOINT = "https://relay.flashbots.net";
 const signer = new Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
@@ -49,13 +49,15 @@ const accountsToLiquidate = [
   // "0x4c74c6978de5f9f6972397648a7092b345911ee8",
   // "0xee2826453a4fd5afeb7ceffeef3ffa2320081268",
   // "0xd026bfdb74fe1baf1e1f1058f0d008cd1eeed8b5",
-  "0xeca023e03127205dca2f196b8b32bdd748203587",
+  // "0xeca023e03127205dca2f196b8b32bdd748203587",
   // "0x6d478cb16317680a517ff89253f82032efdc31ba",
   // "0x7bf97c7a86508cdb54cccbd3e853042b14778ee9",
   // "0x79828e235f405e96fae2f7279cbb7f8aecb46dec",
-  "0x41a9b21b791693730f57154ceed2a2a3607ef1ef",
-  "0x8053b464df2fe2ad38468f1a2d2453fbb3aa9e4b",
+  // "0x41a9b21b791693730f57154ceed2a2a3607ef1ef",
+  // "0x8053b464df2fe2ad38468f1a2d2453fbb3aa9e4b",
+  // "0x5ca9568930f61ba40d90f4d1707a93ab78db6325",
   "0x5ca9568930f61ba40d90f4d1707a93ab78db6325",
+  "0x41a9b21b791693730f57154ceed2a2a3607ef1ef",
 ];
 // const accountsToLiquidate = ["0xeCA023e03127205dCa2F196B8b32bdD748203587"];
 
@@ -922,7 +924,7 @@ async function main() {
   console.log(process.argv);
 
   const authSigner = new Wallet(
-    "0x5000000000000000000000000000000000000000000000000000000000000000"
+    "0x2000000000000000000000000000000000000000000000000000000000000000"
   );
 
   //Create Flashbot Instance
@@ -941,12 +943,16 @@ async function main() {
   console.log("\n");
 
   provider.on("block", async (block) => {
+    console.log("\n");
     console.log(`Beginning of block: ${block}`);
+    console.log("\n");
     const feeData = await provider.getFeeData();
 
     //Method 1
     for (let i = 0; i < accountsToLiquidate.length; i++) {
+      console.log("\n");
       console.log(`Liquidation target: ${accountsToLiquidate[i]}`);
+      console.log("\n");
       const transactionData =
         "0x8615c7a3000000000000000000000000e2e17b2cbbf48211fa7eb8a875360e5e39ba2602000000000000000000000000" +
         accountsToLiquidate[i].slice(2) +
@@ -975,76 +981,86 @@ async function main() {
       try {
         //Simulate
 
-        const sim = await flashbot.simulate(signedTx, targetBlock);
+        // const sim = await flashbot.simulate(signedTx, targetBlock);
 
-        if ("error" in sim.results[0]) {
-          console.log("\n");
-          console.log(`simulation error: ${sim.results[0].error}`);
-          console.log(`Failed in Block Number: ${block}`);
-          console.log(`Failed to liquidate target: ${accountsToLiquidate[i]}`);
-          console.log("\n");
-        } else {
-          //   console.log(`${JSON.stringify(sim, null, 2)}`);
-          console.log("\n");
-          console.log("simulation success!");
-          console.log(`Success in Block Number: ${block}`);
-          console.log(`Liquidation target: ${accountsToLiquidate[i]}`);
-          console.log("\n");
+        // if ("error" in sim.results[0]) {
+        //   console.log("\n");
+        //   console.log(`simulation error: ${sim.results[0].error}`);
+        //   console.log(`Failed in Block Number: ${block}`);
+        //   console.log(`Failed to liquidate target: ${accountsToLiquidate[i]}`);
+        //   console.log("\n");
+        // } else {
+        //   console.log(`${JSON.stringify(sim, null, 2)}`);
+        console.log(
+          await CompoundForksLiquidationBotV2.callStatic.flashLiquidate(
+            "0xe2e17b2CBbf48211FA7eB8A875360e5e39bA2602",
+            accountsToLiquidate[i],
+            50
+          )
+        );
 
-          //Writing log
+        console.log("\n");
+        console.log("simulation success!");
+        console.log(`Success in Block Number: ${block}`);
+        console.log(`Liquidation target: ${accountsToLiquidate[i]}`);
+        console.log("\n");
 
-          const message = `Enter liquidation processs at block ${block} on account ${accountsToLiquidate[i]}`;
+        //Writing log
 
-          fs.appendFile("./log.txt", message, function (err) {
-            if (err) throw err;
-            console.log("Written Deployed Addresses!");
-          });
+        const message = `Enter liquidation processs at block ${block} on account ${accountsToLiquidate[i]}`;
 
-          //Trying liquidation
-          console.log("Beginning liquidation...");
-          console.log("\n");
+        fs.appendFile("./log.txt", message, function (err) {
+          if (err) throw err;
+          console.log("Written Deployed Addresses!");
+        });
 
-          const res = await flashbot.sendRawBundle(signedTx, targetBlock);
-          const res2 = await flashbot.sendRawBundle(signedTx, targetBlock + 1);
-          const res3 = await flashbot.sendRawBundle(signedTx, targetBlock + 2);
-          if ("error" in res) {
-            throw new Error(res.error.message);
-          }
-          //Sending the transactions to flashbot relay
-          const bundleResolution = await res.wait();
-          if (bundleResolution === FlashbotsBundleResolution.BundleIncluded) {
-            //If transaction successfully included, exits
-            console.log(`Congrats, included in ${targetBlock}`);
-            process.exit(0);
-          } else if (
-            bundleResolution ===
-            FlashbotsBundleResolution.BlockPassedWithoutInclusion
-          ) {
-            //If transaction not included, repeat the callback function on new block
-            console.log(`Not included in ${targetBlock}`);
-          } else if (
-            bundleResolution === FlashbotsBundleResolution.AccountNonceTooHigh
-          ) {
-            //If error, exits
-            console.log("Nonce too high, bailing");
-            process.exit(1);
-          }
+        //Trying liquidation
+        console.log("Beginning liquidation...");
+        console.log("\n");
+
+        const res = await flashbot.sendRawBundle(signedTx, targetBlock);
+        const res2 = await flashbot.sendRawBundle(signedTx, targetBlock + 1);
+        const res3 = await flashbot.sendRawBundle(signedTx, targetBlock + 2);
+        if ("error" in res) {
+          throw new Error(res.error.message);
+        }
+        //Sending the transactions to flashbot relay
+        const bundleResolution = await res.wait();
+        if (bundleResolution === FlashbotsBundleResolution.BundleIncluded) {
+          //If transaction successfully included, exits
+          console.log(`Congrats, included in ${targetBlock}`);
+          process.exit(0);
+        } else if (
+          bundleResolution ===
+          FlashbotsBundleResolution.BlockPassedWithoutInclusion
+        ) {
+          //If transaction not included, repeat the callback function on new block
+          console.log(`Not included in ${targetBlock}`);
+        } else if (
+          bundleResolution === FlashbotsBundleResolution.AccountNonceTooHigh
+        ) {
+          //If error, exits
+          console.log("Nonce too high, bailing");
+          process.exit(1);
+          // }
         }
       } catch {
-        console.log("Flashbot or Provider endpoint error");
+        // console.log("Flashbot or Provider endpoint error");
+        console.log(`Not yet liquidtable ${accountsToLiquidate[i]}`);
       }
     }
     console.log("\n");
     console.log(`End of block trying: ${block}`);
     console.log("\n");
-    //Method 2 try static call method
+    await mine(100000000);
 
+    //Method 2 try static call method
     /*
     try {
       await CompoundForksLiquidationBotV2.callStatic.flashLiquidate(
         "0xe2e17b2cbbf48211fa7eb8a875360e5e39ba2602",
         "0xee2826453a4fd5afeb7ceffeef3ffa2320081268",
-        20
+        0
       );
 
       const signedTx = await flashbot.signBundle([
@@ -1072,54 +1088,53 @@ async function main() {
 
       // console.log(sim);
 
-      if ("error" in sim.results[0]) {
-        console.log("\n");
-        console.log(`simulation error: ${sim.results[0].error}`);
-        console.log(`Failed in Block Number: ${block}`);
-        console.log(`Liquidation target: ${accountToLiquidate}`);
-        console.log("\n");
-      } else {
-        //   console.log(`${JSON.stringify(sim, null, 2)}`);
-        console.log("\n");
-        console.log("simulation success!");
-        console.log(`Success in Block Number: ${block}`);
-        console.log(`Liquidation target: ${accountToLiquidate}`);
-        console.log("\n");
+      // if ("error" in sim.results[0]) {
+      //   console.log("\n");
+      //   console.log(`simulation error: ${sim.results[0].error}`);
+      //   console.log(`Failed in Block Number: ${block}`);
+      //   console.log(`Liquidation target: ${accountToLiquidate}`);
+      //   console.log("\n");
+      // } else {
+      //   console.log(`${JSON.stringify(sim, null, 2)}`);
+      console.log("\n");
+      console.log("simulation success!");
+      console.log(`Success in Block Number: ${block}`);
+      console.log(`Liquidation target: ${accountToLiquidate}`);
+      console.log("\n");
 
-        //Trying liquidation
-        console.log("Beginning liquidation...");
-        console.log("\n");
+      //Trying liquidation
+      console.log("Beginning liquidation...");
+      console.log("\n");
 
-        const res = await flashbot.sendRawBundle(signedTx, targetBlock);
-        if ("error" in res) {
-          throw new Error(res.error.message);
-        }
-        //Sending the transactions to flashbot relay
-        const bundleResolution = await res.wait();
-        if (bundleResolution === FlashbotsBundleResolution.BundleIncluded) {
-          //If transaction successfully included, exits
-          console.log(`Congrats, included in ${targetBlock}`);
-          process.exit(0);
-        } else if (
-          bundleResolution ===
-          FlashbotsBundleResolution.BlockPassedWithoutInclusion
-        ) {
-          //If transaction not included, repeat the callback function on new block
-          console.log(`Not included in ${targetBlock}`);
-        } else if (
-          bundleResolution === FlashbotsBundleResolution.AccountNonceTooHigh
-        ) {
-          //If error, exits
-          console.log("Nonce too high, bailing");
-          process.exit(1);
-        }
+      const res = await flashbot.sendRawBundle(signedTx, targetBlock);
+      if ("error" in res) {
+        throw new Error(res.error.message);
+      }
+      //Sending the transactions to flashbot relay
+      const bundleResolution = await res.wait();
+      if (bundleResolution === FlashbotsBundleResolution.BundleIncluded) {
+        //If transaction successfully included, exits
+        console.log(`Congrats, included in ${targetBlock}`);
+        process.exit(0);
+      } else if (
+        bundleResolution ===
+        FlashbotsBundleResolution.BlockPassedWithoutInclusion
+      ) {
+        //If transaction not included, repeat the callback function on new block
+        console.log(`Not included in ${targetBlock}`);
+      } else if (
+        bundleResolution === FlashbotsBundleResolution.AccountNonceTooHigh
+      ) {
+        //If error, exits
+        console.log("Nonce too high, bailing");
+        process.exit(1);
+        // }
       }
     } catch {
       console.log("\n");
       console.log("Static call failed");
       console.log("\n");
-    }
-    */
+    } */
   });
 }
 main();

@@ -28,7 +28,7 @@ const signer = provider.getSigner();
 //@Running on Node
 
 const provider = new providers.JsonRpcProvider({
-  //   url: process.env.CRONOS_PUBLIC_RPC_URL,
+  // url: process.env.CRONOS_PUBLIC_RPC_URL,
   url: process.env.CRONOS_PRIVATE_DEV_RPC_URL,
 });
 const signer = new Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
@@ -79,8 +79,10 @@ async function main() {
   console.log("\n");
 
   let accounts = "";
-  for (let i = 0; i < accountsInteractedWithProtocolFiltered.length; i++) {
-    // for (let i = 0; i < 100; i++) {
+  let accountsArray = [];
+  // for (let i = 0; i < accountsInteractedWithProtocolFiltered.length; i++) {
+  for (let i = 500; i < 2500; i++) {
+    let accountObj = {};
     try {
       //Get Health Factor
       const healthFactor =
@@ -91,31 +93,51 @@ async function main() {
       //Get Total Debt
       const ret = await NewLiquidationBot.callStatic._updateAccountState(
         TectonicCore.address,
-        targetedAccount
+        accountsInteractedWithProtocolFiltered[i]
       );
       const totalDebt = ret[6];
       const totalCollateral = ret[7];
 
       //Push into array
-      if (
-        healthFactor > 700000n &&
-        healthFactor < 1150000n &&
-        totalDebt > 100
-      ) {
+      if (healthFactor > 700000n && healthFactor < 1150000n && totalDebt > 30) {
+        /*
         console.log(accountsInteractedWithProtocolFiltered[i]);
         console.log(healthFactor);
         accounts += `"`;
         accounts += accountsInteractedWithProtocolFiltered[i].toString();
         accounts += `",`;
+        */
+        console.log(accountsInteractedWithProtocolFiltered[i]);
+        console.log(healthFactor);
+        accountObj.address = accountsInteractedWithProtocolFiltered[i];
+        accountObj.healthFactor = healthFactor.toString();
+        accountObj.totalDebt = totalDebt.toString();
+        accountObj.totalCollateral = totalCollateral.toString();
+        // accountObj.healthFactor = healthFactor;
+        // accountObj.totalDebt = totalDebt;
+        // accountObj.totalCollateral = totalCollateral;
+        accountsArray.push(accountObj);
       }
       console.log(i);
       console.log(accountsInteractedWithProtocolFiltered[i]);
-    } catch {}
+    } catch (err) {
+      console.log(`Error in getting info${err}`);
+    }
   }
+  /*
   console.log(accounts);
   fs.appendFile(
     "scripts/Cronos/Tectonic/informations/accountsNearLiquidation.txt",
     accounts,
+    function (err) {
+      if (err) throw err;
+    }
+  );
+  */
+  // console.log(accounts);
+  fs.appendFile(
+    "scripts/Cronos/Tectonic/informations/accountsNearLiquidation.js",
+    JSON.stringify(accountsArray),
     function (err) {
       if (err) throw err;
     }

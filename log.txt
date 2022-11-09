@@ -1,1 +1,1 @@
-Enter liquidation processs at block 15923126 on account 0xeca023e03127205dca2f196b8b32bdd748203587
+Enter liquidation processs at block 15923126 on account 0xeca023e03127205dca2f196b8b32bdd748203587Enter liquidation processs at block 115929057 on account 0x41a9b21b791693730f57154ceed2a2a3607ef1ef
