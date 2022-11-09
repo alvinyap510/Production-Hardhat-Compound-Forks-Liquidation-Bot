@@ -26,9 +26,6 @@ const GWEI = 10n ** 9n;
 const ETHER = 10n ** 18n;
 
 //@Mainnet
-// const provider = new providers.JsonRpcProvider({
-//   url: process.env.MAINNET_RPC_URL,
-// });
 const provider = new providers.JsonRpcProvider({
   // url: process.env.MAINNET_RPC_URL,
   url: process.env.MAINNET_PUBLIC_ANKR_RPC_URL,
@@ -58,6 +55,7 @@ const accountsToLiquidate = [
   // "0x5ca9568930f61ba40d90f4d1707a93ab78db6325",
   "0x5ca9568930f61ba40d90f4d1707a93ab78db6325",
   "0x41a9b21b791693730f57154ceed2a2a3607ef1ef",
+  "0x7b052756f8cb2fdcd9de2f1665d0d6648317346a",
 ];
 // const accountsToLiquidate = ["0xeCA023e03127205dCa2F196B8b32bdD748203587"];
 
@@ -958,24 +956,24 @@ async function main() {
         accountsToLiquidate[i].slice(2) +
         "0000000000000000000000000000000000000000000000000000000000000032";
 
-      const signedTx = await flashbot.signBundle([
-        {
-          signer: signer,
-          transaction: {
-            chainId: 1,
-            type: 2,
-            maxFeePerGas: feeData.maxFeePerGas * 1.5,
-            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas * 2,
-            gasLimit: 8000000,
-            value: 0,
-            data: transactionData,
-            // data: "0x",
-            //   data: "0x8615c7a3000000000000000000000000e2e17b2cbbf48211fa7eb8a875360e5e39ba2602000000000000000000000000ee2826453a4fd5afeb7ceffeef3ffa23200812680000000000000000000000000000000000000000000000000000000000000014",
-            to: "0xa8d15de0cF2a7f6e3BfD3f68b6EdC6b0b946d6a6",
-            // to: "0x",
-          },
-        },
-      ]);
+      // const signedTx = await flashbot.signBundle([
+      //   {
+      //     signer: signer,
+      //     transaction: {
+      //       chainId: 1,
+      //       type: 2,
+      //       maxFeePerGas: feeData.maxFeePerGas * 1.5,
+      //       maxPriorityFeePerGas: feeData.maxPriorityFeePerGas * 2,
+      //       gasLimit: 8000000,
+      //       value: 0,
+      //       data: transactionData,
+      //       // data: "0x",
+      //       //   data: "0x8615c7a3000000000000000000000000e2e17b2cbbf48211fa7eb8a875360e5e39ba2602000000000000000000000000ee2826453a4fd5afeb7ceffeef3ffa23200812680000000000000000000000000000000000000000000000000000000000000014",
+      //       to: "0xa8d15de0cF2a7f6e3BfD3f68b6EdC6b0b946d6a6",
+      //       // to: "0x",
+      //     },
+      //   },
+      // ]);
 
       const targetBlock = block + 1;
       try {
@@ -1009,7 +1007,7 @@ async function main() {
 
         const message = `Enter liquidation processs at block ${block} on account ${accountsToLiquidate[i]}`;
 
-        fs.appendFile("./log.txt", message, function (err) {
+        fs.appendFile("./scripts/Mainnet/log.txt", message, function (err) {
           if (err) throw err;
           console.log("Written Deployed Addresses!");
         });
@@ -1017,6 +1015,26 @@ async function main() {
         //Trying liquidation
         console.log("Beginning liquidation...");
         console.log("\n");
+
+        //Signing flashbot transaction
+        const signedTx = await flashbot.signBundle([
+          {
+            signer: signer,
+            transaction: {
+              chainId: 1,
+              type: 2,
+              maxFeePerGas: feeData.maxFeePerGas * 1.5,
+              maxPriorityFeePerGas: feeData.maxPriorityFeePerGas * 2,
+              gasLimit: 8000000,
+              value: 0,
+              data: transactionData,
+              // data: "0x",
+              //   data: "0x8615c7a3000000000000000000000000e2e17b2cbbf48211fa7eb8a875360e5e39ba2602000000000000000000000000ee2826453a4fd5afeb7ceffeef3ffa23200812680000000000000000000000000000000000000000000000000000000000000014",
+              to: "0xa8d15de0cF2a7f6e3BfD3f68b6EdC6b0b946d6a6",
+              // to: "0x",
+            },
+          },
+        ]);
 
         const res = await flashbot.sendRawBundle(signedTx, targetBlock);
         const res2 = await flashbot.sendRawBundle(signedTx, targetBlock + 1);
@@ -1052,7 +1070,7 @@ async function main() {
     console.log("\n");
     console.log(`End of block trying: ${block}`);
     console.log("\n");
-    await mine(100000000);
+    await mine(10000000);
 
     //Method 2 try static call method
     /*
