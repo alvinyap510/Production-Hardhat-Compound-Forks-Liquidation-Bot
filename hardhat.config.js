@@ -9,6 +9,8 @@ const PRIVATE_KEY_MAINNET = process.env.PRIVATE_KEY_MAINNET || "0xSomething";
 const MAINNET_RPC_URL = process.env.MAINNET_RPC_URL || "https://nothing.com";
 const CRONOS_PUBLIC_RPC_URL =
   process.env.CRONOS_PUBLIC_RPC_URL || "https://nothing.com";
+const CRONOS_PUBLIC_RPC_URL2 =
+  process.env.CRONOS_PUBLIC_RPC_URL2 || "https://nothing.com";
 const CRONOS_PRIVATE_DEV_RPC_URL =
   process.env.CRONOS_PRIVATE_DEV_RPC_URL || "https://nothing.com";
 
@@ -17,8 +19,9 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: MAINNET_RPC_URL,
+        // url: MAINNET_RPC_URL,
         // url: CRONOS_PUBLIC_RPC_URL,
+        url: CRONOS_PUBLIC_RPC_URL2,
         // url: CRONOS_PRIVATE_DEV_RPC_URL,
         // blockNumber: 15884920,
       },
@@ -32,7 +35,7 @@ module.exports = {
       allowUnlimitedContractSize: true,
     },
     cronos: {
-      url: CRONOS_PUBLIC_RPC_URL,
+      url: CRONOS_PUBLIC_RPC_URL2,
       accounts: [PRIVATE_KEY_MAINNET],
       chainID: 25,
     },

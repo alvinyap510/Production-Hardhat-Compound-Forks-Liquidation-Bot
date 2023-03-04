@@ -24,13 +24,13 @@ const accountsInteractedWithProtocolFiltered = require("./informations/accountsI
 const provider = hre.ethers.provider;
 const signer = provider.getSigner();
 */
-
+const provider = hre.ethers.provider;
 //@Running on Node
 
-const provider = new providers.JsonRpcProvider({
-  // url: process.env.CRONOS_PUBLIC_RPC_URL,
-  url: process.env.CRONOS_PRIVATE_DEV_RPC_URL,
-});
+// const provider = new providers.JsonRpcProvider({
+//   // url: process.env.CRONOS_PUBLIC_RPC_URL2,
+//   url: process.env.CRONOS_PRIVATE_DEV_RPC_URL,
+// });
 const signer = new Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
 const CHAIN_ID = 25;
 
@@ -81,7 +81,7 @@ async function main() {
   let accounts = "";
   let accountsArray = [];
   // for (let i = 0; i < accountsInteractedWithProtocolFiltered.length; i++) {
-  for (let i = 500; i < 2500; i++) {
+  for (let i = 5000; i < 6500; i++) {
     let accountObj = {};
     try {
       //Get Health Factor

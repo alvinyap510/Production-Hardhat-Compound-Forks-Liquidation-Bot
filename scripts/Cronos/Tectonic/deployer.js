@@ -85,6 +85,7 @@ async function main() {
   console.log(CompoundForksLiquidationBotV2TectonicSpecialized.address);
   console.log("\n");
 
+  /*
   //@Tester
   console.log("Liquidity:");
   console.log(await TectonicCore.getAccountLiquidity(targetedAccount));
@@ -146,6 +147,7 @@ async function main() {
       targetedAccount
     )
   );
+  */
 }
 
 main();

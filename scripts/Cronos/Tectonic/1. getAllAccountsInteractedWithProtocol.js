@@ -29,7 +29,7 @@ const provider = new providers.JsonRpcProvider({
   url: process.env.CRONOS_PUBLIC_RPC_URL,
   // url: "https://nd-070-506-734.p2pify.com/7b59bf0d5f2e9e10f4a4f7e69fef4544",
 });
-const signer = new Wallet(process.env.PRIVATE_KEY_MAINNET, provider);
+const signer = new s
 const CHAIN_ID = 25;
 
 //@Constants
