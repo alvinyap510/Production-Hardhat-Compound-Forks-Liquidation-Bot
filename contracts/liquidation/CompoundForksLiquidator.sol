@@ -431,19 +431,12 @@ contract CompoundForksLiquidator is
         if (_flashLoanToken == WETH) IS_REPAYING_ETHER = true;
         else IS_REPAYING_ETHER = false;
 
-        // if (_flashLoanToken == WETH)
-        //     require(
-        //         IS_REPAYING_ETHER == true,
-        //         "Why IS_REPAYING_ETHER not true?"
-        //     );
-
         if (_flashLoanMode == 0) {
             aaveV2FlashLoanCall(_flashLoanToken, _flashLoanAmount);
         } else if (_flashLoanMode == 1) {
             uniswapV2FlashLoanCall(_flashLoanToken, _flashLoanAmount);
         }
 
-        //@Author
         //Swap profit back to ETH
         if (address(SEIZED_COLLATERAL) != WETH) {
             uint256 _profitToConvert = SEIZED_COLLATERAL.balanceOf(
@@ -451,17 +444,14 @@ contract CompoundForksLiquidator is
             );
             _fastSwap(address(SEIZED_COLLATERAL), WETH, _profitToConvert);
         }
-        //@Author
+
         //Withdraw ETH from WETH
         IWETH WETH_INTERACT = IWETH(WETH);
         uint256 _amountWethToWithdraw = IERC20(WETH).balanceOf(address(this));
         WETH_INTERACT.withdraw(_amountWethToWithdraw);
 
-        //@Author
         // Bribing Flashbots
-        //
 
-        // @Author
         // Transfer Ether to Owner
         CONTRACT_OWNER.transfer(address(this).balance);
 
@@ -485,11 +475,10 @@ contract CompoundForksLiquidator is
         // (, , uint shortfall) = COMPTROLLER.getAccountLiquidity(_borrower);
         // require(shortfall > 0, "Cannot enter liquidate");
 
-        //@Author
         //Store Opening CToken Balance
         uint256 openingCTokenBalance = IERC20(_cTokenCollateralToSeize)
             .balanceOf(_borrower);
-        //@Author
+
         //If not repaying ether, follow normal liquidation procedure
         if (!IS_REPAYING_ETHER) {
             IERC20 repayToken = IERC20(_repayTokenAddress);
@@ -514,7 +503,6 @@ contract CompoundForksLiquidator is
             //     STokenInterface(_cTokenCollateralToSeize)
             // );
         } else {
-            //@Author
             //Withdraw WETH as Ether first
             IWETH WETH_INTERACT = IWETH(WETH);
             require(
@@ -536,8 +524,6 @@ contract CompoundForksLiquidator is
                 address(this).balance != 0,
                 "Why dont have ether after unwrap?"
             );
-
-            //@Author
             //Repaying ether requires special CEther Interface
             CEther repayCEther = CEther(_repayCTokenAddress);
             repayCEther.liquidateBorrow{value: _repayAmount}(
@@ -560,14 +546,12 @@ contract CompoundForksLiquidator is
         }
     }
 
-    //@Author
     function _withdrawCToken(address _cTokenAddress) internal {
         ISErc20Delegator CToken = ISErc20Delegator(_cTokenAddress);
         uint256 redeemAmount = CToken.balanceOf(address(this));
         CToken.redeem(redeemAmount);
     }
 
-    //@Author
     function _fastSwap(
         address _tokenIn,
         address _tokenOut,
@@ -581,7 +565,6 @@ contract CompoundForksLiquidator is
         _swap(_tokenIn, _tokenOut, _amountIn, _amountOutMin, address(this));
     }
 
-    //@Author
     function _getAmountOutMin(
         address _tokenIn,
         address _tokenOut,

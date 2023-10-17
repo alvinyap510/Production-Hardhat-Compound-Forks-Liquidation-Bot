@@ -25,6 +25,8 @@ import {SafeMath} from "./Libraries.sol";
 
 // FlashLoanReceiverBase,
 // IUniswapV2Callee,
+// Withdrwable
+// Ownable => Inherited from Withdrawable
 contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
     Withdrawable,
     FlashLoanReceiverBase,
