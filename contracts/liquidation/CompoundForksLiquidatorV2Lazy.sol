@@ -23,11 +23,18 @@ import {FlashLoanReceiverBase} from "./FlashLoanReceiverBase.sol";
 import {ILendingPool, ILendingPoolAddressesProvider} from "./Interfaces.sol";
 import {SafeMath} from "./Libraries.sol";
 
+/***
+ * This is the lazy version of CompoundForksLiquidator.sol, where
+ * the calculation on which is the highest debt to replay etc. all
+ * happen on chain.
+ * Incurring significant more gas fee, use with caution.
+ * ***/
+
 // FlashLoanReceiverBase,
 // IUniswapV2Callee,
 // Withdrwable
 // Ownable => Inherited from Withdrawable
-contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
+contract CompoundForksLiquidatorV2Lazy is
     Withdrawable,
     FlashLoanReceiverBase,
     IUniswapV2Callee
@@ -370,7 +377,6 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
         );
     }
 
-    //@Author
     //Sub function to get the total supplied asset amount of the underlying token
     function _getCollateralUnderlyingAmountInToken(
         address _CTokenAddress,
@@ -382,7 +388,6 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
         return _CTokenAmount.mul(_exchangeRate).div(1e18);
     }
 
-    //@Author
     //Sub function to get the total borrowed debt of the underlying token
     function _getDebtUnderlyingAmountInToken(
         address _CTokenAddress,
@@ -393,7 +398,6 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
         return _debt;
     }
 
-    //@Author
     //Sub function to get USD Value of the total underlying asset
     function _getUsdValueOfAsset(
         address _CTokenAddress,
@@ -405,7 +409,6 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
             _amount.mul(priceFeed.getUnderlyingPrice(_CTokenAddress)).div(1e36);
     }
 
-    //@Author
     //Function to update CToken's borrowing state
     function getSupplyBalance(
         address _cTokenCollateral
@@ -614,8 +617,6 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
         return amountOutMins[path.length - 1];
     }
 
-    //@Author
-    //Done
     function _swap(
         address _tokenIn,
         address _tokenOut,
@@ -972,7 +973,6 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
         LENDING_POOL = ILendingPool(ADDRESSES_PROVIDER.getLendingPool());
     }
 
-    //@Author
     //Function to withdraw in case mistake is made
     function approveToken(
         address _tokenAddress,
@@ -984,7 +984,6 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
         token.safeApprove(_spenderAddress, _amount);
     }
 
-    //@Author
     //Function to make this contract able to accept funds
     receive() external payable {}
 }

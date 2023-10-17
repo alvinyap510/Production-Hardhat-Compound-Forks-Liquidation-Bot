@@ -86,6 +86,7 @@ contract CompoundForksLiquidator is
     // ILendingPool public LENDING_POOL; => Declared on inheritance
 
     /***  VARIABLES UPDATED ON LIQUIDATION CALL ***/
+    // Declared here instead of inside function to avoid stack too flow / too many local variables error
     Comptroller public COMPTROLLER;
     address public BORROWER_TO_BE_LIQUIDATED;
     address public FLASH_LOAN_TOKEN;
@@ -583,8 +584,7 @@ contract CompoundForksLiquidator is
         }
 
         // same length as path
-        //@Author
-        //New version Router => Change Code
+        // New version Router => Change Code
 
         uint[] memory amountOutMins = IUniswapV2Router(ROUTER).getAmountsOut(
             _amountIn,
@@ -594,8 +594,6 @@ contract CompoundForksLiquidator is
         return amountOutMins[path.length - 1];
     }
 
-    //@Author
-    //Done
     function _swap(
         address _tokenIn,
         address _tokenOut,
