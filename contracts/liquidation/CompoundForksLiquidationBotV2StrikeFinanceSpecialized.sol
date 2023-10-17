@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.8.17;
+pragma solidity ^0.8.0;
 
 /********************/
 /* Flashloan Source */
@@ -307,17 +307,13 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
 
     //@Author
 
-    function _updateAccountState(address _comptroller, address _borrower)
+    function _updateAccountState(
+        address _comptroller,
+        address _borrower
+    )
         public
         onlyOwner
-        returns (
-            address,
-            uint256,
-            uint256,
-            address,
-            uint256,
-            uint256
-        )
+        returns (address, uint256, uint256, address, uint256, uint256)
     {
         address _highestDebtToRepay;
         uint256 _highestDebtToRepayInToken = 0;
@@ -409,20 +405,16 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
 
     //@Author
     //Function to update CToken's borrowing state
-    function getSupplyBalance(address _cTokenCollateral)
-        public
-        onlyOwner
-        returns (uint)
-    {
+    function getSupplyBalance(
+        address _cTokenCollateral
+    ) public onlyOwner returns (uint) {
         return CErc20(_cTokenCollateral).balanceOfUnderlying(address(this));
     }
 
-    function getHealthFactor(address _comptroller, address _borrower)
-        public
-        view
-        onlyOwner
-        returns (uint256)
-    {
+    function getHealthFactor(
+        address _comptroller,
+        address _borrower
+    ) public view onlyOwner returns (uint256) {
         uint256 _accountTotalCollateralFactoredInUsd = 0;
         uint256 _accountTotalDebtInUsd = 1;
         Comptroller comptroller = Comptroller(_comptroller);
@@ -971,10 +963,9 @@ contract CompoundForksLiquidationBotV2StrikeFinanceSpecialized is
         FACTORY = IUniswapV2Router(_router).factory();
     }
 
-    function updateLendingPoolAddressesProvider(address _addressProvider)
-        external
-        onlyOwner
-    {
+    function updateLendingPoolAddressesProvider(
+        address _addressProvider
+    ) external onlyOwner {
         ADDRESSES_PROVIDER = ILendingPoolAddressesProvider(_addressProvider);
         LENDING_POOL = ILendingPool(ADDRESSES_PROVIDER.getLendingPool());
     }

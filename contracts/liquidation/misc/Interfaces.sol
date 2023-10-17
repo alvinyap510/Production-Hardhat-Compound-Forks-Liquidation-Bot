@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.8.17;
+pragma solidity ^0.8.0;
 
 pragma experimental ABIEncoderV2;
 
@@ -26,9 +26,10 @@ interface IERC20 {
      *
      * Emits a {Transfer} event.
      */
-    function transfer(address recipient, uint256 amount)
-        external
-        returns (bool);
+    function transfer(
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
 
     /**
      * @dev Returns the remaining number of tokens that `spender` will be
@@ -38,10 +39,10 @@ interface IERC20 {
      * This value changes when {approve} or {transferFrom} are called.
      */
 
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint256);
+    function allowance(
+        address owner,
+        address spender
+    ) external view returns (uint256);
 
     function decimals() external view returns (uint8);
 
@@ -362,11 +363,7 @@ interface ILendingPool {
      *   wants to receive it on his own wallet, or a different address if the beneficiary is a
      *   different wallet
      **/
-    function withdraw(
-        address asset,
-        uint256 amount,
-        address to
-    ) external;
+    function withdraw(address asset, uint256 amount, address to) external;
 
     /**
      * @dev Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower
@@ -432,8 +429,10 @@ interface ILendingPool {
      * @param asset The address of the underlying asset deposited
      * @param useAsCollateral `true` if the user wants to use the deposit as collateral, `false` otherwise
      **/
-    function setUserUseReserveAsCollateral(address asset, bool useAsCollateral)
-        external;
+    function setUserUseReserveAsCollateral(
+        address asset,
+        bool useAsCollateral
+    ) external;
 
     /**
      * @dev Function to liquidate a non-healthy position collateral-wise, with Health Factor below 1
@@ -491,7 +490,9 @@ interface ILendingPool {
      * @return ltv the loan to value of the user
      * @return healthFactor the current health factor of the user
      **/
-    function getUserAccountData(address user)
+    function getUserAccountData(
+        address user
+    )
         external
         view
         returns (
@@ -523,40 +524,36 @@ interface ILendingPool {
      * @param asset The address of the underlying asset of the reserve
      * @return The configuration of the reserve
      **/
-    function getConfiguration(address asset)
-        external
-        view
-        returns (DataTypes.ReserveConfigurationMap memory);
+    function getConfiguration(
+        address asset
+    ) external view returns (DataTypes.ReserveConfigurationMap memory);
 
     /**
      * @dev Returns the configuration of the user across all the reserves
      * @param user The user address
      * @return The configuration of the user
      **/
-    function getUserConfiguration(address user)
-        external
-        view
-        returns (DataTypes.UserConfigurationMap memory);
+    function getUserConfiguration(
+        address user
+    ) external view returns (DataTypes.UserConfigurationMap memory);
 
     /**
      * @dev Returns the normalized income normalized income of the reserve
      * @param asset The address of the underlying asset of the reserve
      * @return The reserve's normalized income
      */
-    function getReserveNormalizedIncome(address asset)
-        external
-        view
-        returns (uint256);
+    function getReserveNormalizedIncome(
+        address asset
+    ) external view returns (uint256);
 
     /**
      * @dev Returns the normalized variable debt per unit of asset
      * @param asset The address of the underlying asset of the reserve
      * @return The reserve normalized variable debt
      */
-    function getReserveNormalizedVariableDebt(address asset)
-        external
-        view
-        returns (uint256);
+    function getReserveNormalizedVariableDebt(
+        address asset
+    ) external view returns (uint256);
 
     // /**
     //  * @dev Returns the state and configuration of the reserve
@@ -569,7 +566,9 @@ interface ILendingPool {
     //     view
     //     returns (DataTypes.ReserveData memory);
 
-    function getReserveData(address _reserve)
+    function getReserveData(
+        address _reserve
+    )
         external
         view
         returns (

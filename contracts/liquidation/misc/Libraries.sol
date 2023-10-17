@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.8.17;
+pragma solidity ^0.8.0;
 
 pragma experimental ABIEncoderV2;
 
@@ -228,11 +228,7 @@ library SafeERC20 {
     using SafeMath for uint256;
     using Address for address;
 
-    function safeTransfer(
-        IERC20 token,
-        address to,
-        uint256 value
-    ) internal {
+    function safeTransfer(IERC20 token, address to, uint256 value) internal {
         callOptionalReturn(
             token,
             abi.encodeWithSelector(token.transfer.selector, to, value)

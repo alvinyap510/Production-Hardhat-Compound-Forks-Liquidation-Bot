@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/CompoundInterfaces.sol";
@@ -43,10 +43,9 @@ contract TestCompoundLiquidate {
     }
 
     // not view function
-    function getSupplyBalance(address _cTokenCollateral)
-        external
-        returns (uint)
-    {
+    function getSupplyBalance(
+        address _cTokenCollateral
+    ) external returns (uint) {
         return CErc20(_cTokenCollateral).balanceOfUnderlying(address(this));
     }
 
@@ -158,10 +157,9 @@ contract CompoundLiquidator {
 
     // get amount liquidated
     // not view function
-    function getSupplyBalance(address _cTokenCollateral)
-        external
-        returns (uint)
-    {
+    function getSupplyBalance(
+        address _cTokenCollateral
+    ) external returns (uint) {
         return CErc20(_cTokenCollateral).balanceOfUnderlying(address(this));
     }
 }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.8.17;
+pragma solidity ^0.8.0;
 
 /********************/
 /* Flashloan Source */
@@ -57,7 +57,7 @@ import "../interfaces/IWETH.sol";
 import "../interfaces/CEtherInterface.sol";
 import "../interfaces/CTokenInterfaces.sol";
 
-import {Withdrawable} from "./Withdrawable.sol";
+import {Withdrawable} from "./misc/Withdrawable.sol";
 import {FlashLoanReceiverBase} from "./FlashLoanReceiverBase.sol";
 import {ILendingPool, ILendingPoolAddressesProvider, IERC20} from "./Interfaces.sol";
 import {SafeMath} from "./Libraries.sol";
