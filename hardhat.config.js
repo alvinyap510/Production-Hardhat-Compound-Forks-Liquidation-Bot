@@ -19,11 +19,10 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        // url: MAINNET_RPC_URL,
-        // url: CRONOS_PUBLIC_RPC_URL,
-        url: CRONOS_PUBLIC_RPC_URL2,
-        // url: CRONOS_PRIVATE_DEV_RPC_URL,
-        // blockNumber: 15884920,
+        url: MAINNET_RPC_URL,
+        url: CRONOS_PUBLIC_RPC_URL,
+        url: CRONOS_PRIVATE_DEV_RPC_URL,
+        blockNumber: 15884920,
       },
       // allowUnlimitedContractSize: true,
     },
