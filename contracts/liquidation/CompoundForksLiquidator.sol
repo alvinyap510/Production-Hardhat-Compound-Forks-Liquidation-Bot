@@ -62,7 +62,11 @@ import {FlashLoanReceiverBase} from "./FlashLoanReceiverBase.sol";
 import {ILendingPool, ILendingPoolAddressesProvider, IERC20} from "./Interfaces.sol";
 import {SafeMath} from "./Libraries.sol";
 
-contract CompoundForksLiquidationBot is
+// FlashLoanReceiverBase
+// IUniswapV2Callee
+// Withdrawable
+// Ownable => Inherited from Withdrawable
+contract CompoundForksLiquidator is
     FlashLoanReceiverBase,
     IUniswapV2Callee,
     Withdrawable
@@ -70,16 +74,18 @@ contract CompoundForksLiquidationBot is
     using SafeMath for uint256;
     event Log(string message, uint val);
 
-    //Contract Global Variables
+    /*** CONSTANT VARIABLES ***/
     address payable public CONTRACT_OWNER;
     IUniswapV2Router public ROUTER;
     address public WETH;
     address public FACTORY;
 
+    /*** INHERITED VARIABLES ***/
+
     // ILendingPoolAddressesProvider public ADDRESSES_PROVIDER; => Declared on inheritance
     // ILendingPool public LENDING_POOL; => Declared on inheritance
 
-    //Liquidate Variables Storage
+    /***  VARIABLES UPDATED ON LIQUIDATION CALL ***/
     Comptroller public COMPTROLLER;
     address public BORROWER_TO_BE_LIQUIDATED;
     address public FLASH_LOAN_TOKEN;
@@ -102,9 +108,12 @@ contract CompoundForksLiquidationBot is
         FACTORY = _FACTORY;
     }
 
-    /*
-    function withdraw(address _assetAddress) public onlyOwner; => Inheritance from Withdrawable.sol
-    */
+    /*** FUNCTIONS ***/
+
+    /***  HELPER FUNCTIONS ***/
+
+    // To withdraw ERCO20 tokens from this contract by onwer
+    // function withdraw(address _assetAddress) public onlyOwner; => Inheritance from Withdrawable.sol
 
     //To approve other contracts to pull tokens in case code goes wrong
     function approveToken(
@@ -117,8 +126,9 @@ contract CompoundForksLiquidationBot is
         token.approve(_spenderAddress, _amount);
     }
 
-    //Call flash loan from Aave V2
+    /***  FLASHLOAN FUNCTIONS ***/
 
+    //Using AaveV2 as FlashLoan source
     function aaveV2FlashLoanCall(
         address _flashLoanToken,
         uint256 _flashLoanAmount
@@ -150,7 +160,8 @@ contract CompoundForksLiquidationBot is
         );
     }
 
-    //This function is called by Aave LendingPool after FlashLoan
+    //Called by AaveV2 LendingPool to callback flashloan + interest
+    //Actually executes custom logics of this contract and do the liquidation flow
     function executeOperation(
         address[] calldata assets,
         uint256[] calldata amounts,
@@ -162,10 +173,6 @@ contract CompoundForksLiquidationBot is
         /* Custom Logic Goes Here */
         /********************/
 
-        /********************/
-        /* Custom Logic Goes Here */
-        /********************/
-        //@Author
         //Call _liquidate
         _liquidate(
             BORROWER_TO_BE_LIQUIDATED,
@@ -175,7 +182,6 @@ contract CompoundForksLiquidationBot is
             CTOKEN_COLLATERAL_TO_SEIZE
         );
 
-        //@Author
         //Redeem underlying Asset
         /*
         ISErc20Delegator CToken = ISErc20Delegator(CTOKEN_COLLATERAL_TO_SEIZE);
@@ -184,25 +190,21 @@ contract CompoundForksLiquidationBot is
         */
         _withdrawCToken(CTOKEN_COLLATERAL_TO_SEIZE);
 
-        //@Auhthor
         //Swap back to flash loan token to repay
-
+        //Different flow on either seizing Ether or other ERC20 Tokens
         IERC20 _seizedAsset;
 
         if (IS_SEIZING_CETHER) {
-            //@Author
             //If seized asset is Ether, redeposit ether back as WETH
             require(address(this).balance != 0, "Why contract ether is 0?");
             _seizedAsset = IERC20(WETH);
-            // uint256 contractEther = address(this).balance;
             IWETH(WETH).deposit{value: address(this).balance}();
             require(
                 address(this).balance == 0,
                 "Not successfully rewrap as Weth"
             );
         } else {
-            //@Author
-            //Means not seized WETH
+            //Seizing normal ERC20 Collateral
             address _underlyingAsset = ISErc20Delegator(
                 CTOKEN_COLLATERAL_TO_SEIZE
             ).underlying();
@@ -211,8 +213,7 @@ contract CompoundForksLiquidationBot is
         SEIZED_COLLATERAL = _seizedAsset;
         require(_seizedAsset.balanceOf(address(this)) != 0, "Here");
 
-        //@Author
-        //If seizedAsset != Flash loan asset => swap to flashToken
+        //If seizedAsset != flashloan borrowed assets => swap back to flashloan borrowed assets
         if (address(_seizedAsset) != FLASH_LOAN_TOKEN) {
             uint256 _amountIn = _seizedAsset.balanceOf(address(this));
             uint256 _amountMinOut = _getAmountOutMin(
@@ -233,10 +234,6 @@ contract CompoundForksLiquidationBot is
         /* Custom Logic Ends Here */
         /********************/
 
-        /********************/
-        /* Custom Logic Ends Here */
-        /********************/
-
         // Approve the LendingPool contract allowance to *pull* the owed amount
         for (uint i = 0; i < assets.length; i++) {
             uint amountOwing = amounts[i].add(premiums[i]);
@@ -246,6 +243,7 @@ contract CompoundForksLiquidationBot is
         return true;
     }
 
+    //Using UniswapV2 forks as FlashLoan source
     function uniswapV2FlashLoanCall(
         address _flashLoanToken,
         uint _flashLoanAmount
@@ -313,7 +311,6 @@ contract CompoundForksLiquidationBot is
         /********************/
         /* Custom Logic Goes Here */
         /********************/
-        //@Author
         //Call _liquidate
         _liquidate(
             BORROWER_TO_BE_LIQUIDATED,
@@ -323,7 +320,6 @@ contract CompoundForksLiquidationBot is
             CTOKEN_COLLATERAL_TO_SEIZE
         );
 
-        //@Author
         //Redeem underlying Asset
         /*
         ISErc20Delegator CToken = ISErc20Delegator(CTOKEN_COLLATERAL_TO_SEIZE);
@@ -332,25 +328,21 @@ contract CompoundForksLiquidationBot is
         */
         _withdrawCToken(CTOKEN_COLLATERAL_TO_SEIZE);
 
-        //@Auhthor
         //Swap back to flash loan token to repay
-
+        //Different flow on either seizing Ether or other ERC20 Tokens
         IERC20 _seizedAsset;
 
         if (IS_SEIZING_CETHER) {
-            //@Author
             //If seized asset is Ether, redeposit ether back as WETH
             require(address(this).balance != 0, "Why contract ether is 0?");
             _seizedAsset = IERC20(WETH);
-            // uint256 contractEther = address(this).balance;
             IWETH(WETH).deposit{value: address(this).balance}();
             require(
                 address(this).balance == 0,
                 "Not successfully rewrap as Weth"
             );
         } else {
-            //@Author
-            //Means not seized WETH
+            //Seizing normal ERC20 Collateral
             address _underlyingAsset = ISErc20Delegator(
                 CTOKEN_COLLATERAL_TO_SEIZE
             ).underlying();
@@ -359,8 +351,7 @@ contract CompoundForksLiquidationBot is
         SEIZED_COLLATERAL = _seizedAsset;
         require(_seizedAsset.balanceOf(address(this)) != 0, "Here");
 
-        //@Author
-        //If seizedAsset != Flash loan asset => swap to flashToken
+        //If seizedAsset != flashloan borrowed assets => swap back to flashloan borrowed assets
         if (address(_seizedAsset) != FLASH_LOAN_TOKEN) {
             uint256 _amountIn = _seizedAsset.balanceOf(address(this));
             uint256 _amountMinOut = _getAmountOutMin(
@@ -380,9 +371,10 @@ contract CompoundForksLiquidationBot is
         /********************/
         /* Custom Logic Ends Here */
         /********************/
-
         IERC20(tokenBorrow).transfer(pair, amountToRepay);
     }
+
+    /*** MAIN LIQUIDATION FUNCTION ***/
 
     function flashLiquidate(
         uint _flashLoanMode,
@@ -395,25 +387,20 @@ contract CompoundForksLiquidationBot is
         address _cTokenCollateralToSeize,
         bool _isSeizingCEther
     ) public onlyOwner {
-        //@Author
         // _flashLoanMode 0 = Aave FlashLoan
         // _flashLoanMode 1 = Uniswap FlashLoan
-        // If flash loan source unknown, function reverts
         require(
             _flashLoanMode == 0 || _flashLoanMode == 1,
             "Flash loan source unknown"
         );
-        //@Author
         // Require valid bribe amount
         require(_bribe >= 0 && _bribe <= 100, "Invalid bribe");
 
-        //@Author
         // Store the starting balance of owner to compare
         uint256 ownerStartingEthBalance = CONTRACT_OWNER.balance;
         require(ownerStartingEthBalance != 0, "Why owner has 0 ether?");
 
-        //@Author
-        //Assigning global variables
+        //Reassigning global variables
         COMPTROLLER = Comptroller(_comptroller);
         BORROWER_TO_BE_LIQUIDATED = _borrowerToBeLiquidated;
 
@@ -435,7 +422,6 @@ contract CompoundForksLiquidationBot is
         require(shortfall > 0, "Cannot liquidate");
         */
 
-        //@Author
         //Get token to flash loan, amount & C Token
         FLASH_LOAN_TOKEN = _flashLoanToken;
         FLASH_LOAN_AMOUNT = _flashLoanAmount;
