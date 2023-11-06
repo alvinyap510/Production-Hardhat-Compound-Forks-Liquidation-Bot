@@ -77,8 +77,8 @@ contract CompoundForksLiquidator is
     /*** CONSTANT VARIABLES ***/
     address payable public CONTRACT_OWNER;
     IUniswapV2Router public ROUTER;
-    address public WETH;
     address public FACTORY;
+    address public WETH;
 
     /*** INHERITED VARIABLES ***/
 
