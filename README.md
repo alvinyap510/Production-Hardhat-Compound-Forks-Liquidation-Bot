@@ -1,8 +1,8 @@
-# Production-Hardhat-Compound-Forks-Liquidation-Bot
+# Compound Forks Liquidator
 
 ## Introduction
 
-This is an early project of mine that went into production, and actually made a bit of profit in the early days by liquidating unhealthy positions on Compound and fork projects of Compound, since Compound and its fork projects has the same interface and works mostly the same.
+This is an early project of mine that went into production, and actually made a bit of profit in the early days by liquidating unhealthy positions on Compound & Compound forks.
 
 Due to the increasing competitiveness of the MEV / Liquidation sceneary, this liquidation bot is no longer profitable anymore.
 
@@ -16,12 +16,6 @@ PS: This is an early project in my programming journey, and wasn't meant to be p
 - Build Tool / Development Environment: Hardhat
 - Backend: Ethers.js
 - Relayer: Flashbots
-
-## How To Run
-
-```
-
-```
 
 ## Key Concepts
 
